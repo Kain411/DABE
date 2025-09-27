@@ -74,7 +74,7 @@ async function signInWithGoogle(googleIdToken) {
 
   const body = {
     postBody: `id_token=${googleIdToken}&providerId=google.com`,
-    requestUri: 'http://localhost',
+    requestUri: 'https://bedatn-eosin.vercel.app',
     returnIdpCredential: true,
     returnSecureToken: true
   };
