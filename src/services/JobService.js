@@ -49,7 +49,7 @@ class JobService {
 
             for (const service of validated.services) {
                 const detailRef = await db.collection('healthcareDetails').add({
-                    uid: service.uid,
+                    serviceID: service.uid,
                     quantity: service.quantity,
                 })
                 healthcareDetailIDs.push(detailRef.id)
@@ -255,7 +255,7 @@ class JobService {
             for (const healthcareDetailID of healthcareDetails) {
                 const serviceQuantityDoc = await db.collection('healthcareDetails').doc(healthcareDetailID).get();
                 services.push({
-                    uid: serviceQuantityDoc.data().uid,
+                    uid: serviceQuantityDoc.data().serviceID,
                     quantity: serviceQuantityDoc.data().quantity
                 })
             } 
