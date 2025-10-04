@@ -217,7 +217,7 @@ class JobService {
     async getJobsByServiceType(serviceType) {
         try {
             const db_name = `${serviceType.toLowerCase()}Jobs`;
-            const snapshot = await db.collection(db_name).get();
+            const snapshot = await db.collection(db_name).where('status', '==', 'Hiring').get();
 
             const jobs = [];
 
@@ -240,7 +240,6 @@ class JobService {
         data['user'] = userDoc;
         data['createdAt'] = formatDate(data.createdAt.toDate());
 
-        console.log(data.serviceType)
         if (data.serviceType==='CLEANING') {
             const duration = await TimeService.getDurationByID(data.durationID);
             data['duration'] = duration;
