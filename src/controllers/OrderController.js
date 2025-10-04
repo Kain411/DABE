@@ -70,19 +70,48 @@ const getOrdersByWorkerID = async (req, res) => {
     }
 }
 
+
+const checkOrderQuantity = async (uid) => {
+    const order = await OrderService.getByUID(uid);
+
+    let workerQuantity = 1;
+    const job = await JobService.getByUID(order.jobID, order.serviceType);
+    
+    if (job.serviceType==='HEALTHCARE') workerQuantity = job.workerQuantity;
+
+    const orders = await OrderService.getOrdersByJobID(job.uid);
+
+    const filterOrders = orders.filter(doc => doc.status==='Accepted');
+
+    if (filterOrders.length<workerQuantity) {
+        if (filterOrders.length+1==workerQuantity) {
+            await OrderService.setRejectOrder(job.uid, order.uid);
+        }
+        return true;
+    }
+    return false;
+}
+
 const putStatusByUID = async (req, res) => {
     try {
         const { uid, status } = req.body;
 
-        if (status!='Accepted' && status!='Rejected') {
+        if (status!=='Accepted' && status!=='Rejected') {
             failResponse(res, 401, 'Sai trạng thái');
         }
 
-        const updatedOrder = await OrderService.putStatusByUID(uid, status);
+        let check = true;
+        if (status==='Accepted') {
+            check = await checkOrderQuantity(uid);
+        }
 
-        await orderStatusNotification(updatedOrder);
+        if (check) {
+            const updatedOrder = await OrderService.putStatusByUID(uid, status);
+            await orderStatusNotification(updatedOrder);
 
-        return successDataResponse(res, 200, updatedOrder, 'updatedOrder');
+            return successDataResponse(res, 200, updatedOrder, 'updatedOrder');
+        }
+        else return failResponse(res, 500, 'Số lượng worker đạt giới hạn')
     } catch (err) {
         console.log(err.message);
         return failResponse(res, 500, err.message)
