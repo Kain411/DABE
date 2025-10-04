@@ -5,7 +5,9 @@ const OrderService = require("../services/OrderService");
 const TimeService = require("../services/TimeService");
 const { createNotify, saveAndSendNotification } = require("./tool");
 
-let cleaningJobInterval = null, healthcareJobInterval = null;
+let cleaningJobInterval = null;
+let healthcareJobInterval = null;
+
 const title = 'Thông báo công việc';
 
 const pad = (n) => n.toString().padStart(2, '0');
@@ -133,11 +135,7 @@ const jobSchedule = (serviceType, collectionName, intervalRef) => {
     }, 60000);
 };
 
-const jobScheduleAuto = () => {
-    Promise.all([
-        jobSchedule('CLEANING', 'cleaningJobs', { value: cleaningJobInterval }),
-        jobSchedule('HEALTHCARE', 'healthcareJobs', { value: healthcareJobInterval })
-    ])
-}
+const cleaningJobSchedule = () => jobSchedule('CLEANING', 'cleaningJobs', { value: cleaningJobInterval });
+const healthcareJobSchedule = () => jobSchedule('HEALTHCARE', 'healthcareJobs', { value: healthcareJobInterval });
 
-module.exports = { jobScheduleAuto };
+module.exports = { cleaningJobSchedule, healthcareJobSchedule };

@@ -45,8 +45,16 @@ app.use('/api/notifications', NotificationRouter);
 const PaymentRouter = require('./src/routes/PaymentRouter');
 app.use('/api/payments', PaymentRouter);
 
-const { jobScheduleAuto } = require('./src/notifications/JobNotifications');
-jobScheduleAuto();
+const { cleaningJobSchedule, healthcareJobSchedule } = require('./src/notifications/JobNotifications');
+const { checkCleaningJob, checkHealthcareJob, checkMaintenanceJob } = require('./src/notifications/JobCancel');
+
+Promise.all([
+    cleaningJobSchedule(),
+    healthcareJobSchedule(),
+    checkCleaningJob(),
+    checkHealthcareJob(),
+    checkMaintenanceJob()
+])
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
