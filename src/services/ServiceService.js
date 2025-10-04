@@ -45,7 +45,17 @@ class ServiceService {
                 throw new Error("Không tìm thấy thông tin");
             }
 
-            return (new MaintenanceServiceModel({ uid: uid, ...maintenanceDoc.data() })).getInfo();
+            const powers = [];
+            for (let powerID of maintenanceDoc.data().powers) {
+                const powerDoc = await db.collection('powers').doc(powerID).get();
+                if (!powerDoc.exists) continue;
+
+                powers.push({ uid: powerDoc.id, ...powerDoc.data() })
+            }
+
+            const service = { uid: uid, ...maintenanceDoc.data(), powers: powers };
+
+            return (new MaintenanceServiceModel(service)).getInfo();
 
         } catch (err) {
             console.log(err.message);
@@ -94,11 +104,23 @@ class ServiceService {
             const snapshot = await db.collection('maintenanceServices').get();
             const services = [];
 
-            for (const doc of snapshot.docs) {
-                const serviceDoc = new MaintenanceServiceModel({ uid: doc.id, ...doc.data() });
+            await Promise.all(snapshot.docs.map(async (doc) => {
+
+                const powers = [];
+                for (let powerID of doc.data().powers) {
+                    const powerDoc = await db.collection('powers').doc(powerID).get();
+                    if (!powerDoc.exists) return;
+
+                    powers.push({ uid: powerDoc.id, ...powerDoc.data() });
+                    
+                }
+
+                const service = { uid: doc.id, ...doc.data(), powers: powers };
+
+                const serviceDoc = new MaintenanceServiceModel(service);
                 const validated = await MaintenanceServiceValid.validateAsync(serviceDoc.getInfo(), { stripUnknown: true });
                 services.push(validated);
-            }
+            }))
 
             return services;
         } catch (err) {

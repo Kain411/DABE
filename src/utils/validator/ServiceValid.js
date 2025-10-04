@@ -23,7 +23,12 @@ const MaintenanceServiceValid = Joi.object({
     serviceType: Joi.string().valid('MAINTENANCE').required(),
     serviceName: Joi.string().required(),
     powers: Joi.array().items(
-        Joi.string()
+        Joi.object({
+            uid: Joi.string().required(),
+            name: Joi.string().required(),
+            price: Joi.number().required(),
+            priceAction: Joi.number().required()
+        })
     ).required(),
     maintenance: Joi.string().required(),
 })

@@ -30,7 +30,7 @@ const HealthcareJobValid = JobValid.keys({
     }),
     services: Joi.array().items(
         Joi.object({
-            serviceID: Joi.string().required(),
+            uid: Joi.string().required(),
             quantity: Joi.number().valid(1, 2).required()
         })
     ).min(1).required()
@@ -42,12 +42,11 @@ const MaintenanceJobValid = JobValid.keys({
             uid: Joi.string().required(),
             powers: Joi.array().items(
                 Joi.object({
-                    powerName: Joi.string().required(),
+                    uid: Joi.string().required(),
                     quantity: Joi.number().required(),
-                    quantityMaintenance: Joi.number().required(),
+                    quantityAction: Joi.number().required()
                 })
             ),
-            maintenance: Joi.string().required()
         })
     )
 })
