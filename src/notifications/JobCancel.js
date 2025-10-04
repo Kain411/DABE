@@ -23,7 +23,29 @@ const dayOfMonth = {
     12: 31,
 }
 
-const getDayCancel = () => {
+const getNotPaymentDayCancle = () => {
+    const now = new Date();
+    const pad = (n) => n.toString().padStart(2, '0');
+
+    let day = now.getDate();
+    let month = now.getMonth() + 1;
+    let year = now.getFullYear();
+
+    day += 2;
+    if (day > dayOfMonth[month]) {
+        day = day - dayOfMonth[month];
+        month += 1;
+
+        if (month>12) {
+            month = 1;
+            year += 1;
+        }
+    }
+
+    return `${pad(day)}/${pad(month)}/${year}`;
+}
+
+const getHiringDayCancel = () => {
     const now = new Date();
     const pad = (n) => n.toString().padStart(2, '0');
 
@@ -58,21 +80,19 @@ const checkJob = (serviceType, collectionName, intervalRef) => {
     if (intervalRef.value) return;
 
     intervalRef.value = setInterval(async () => {
-        const dayCancel = getDayCancel();
+        const notPaymentDayCancel = getNotPaymentDayCancle();
+        const hiringDayCancel = getHiringDayCancel();
         
         const snapshot = await db.collection(collectionName).where('status', 'in', ['Not Payment', 'Hiring']).get();
         
         await Promise.all(snapshot.docs.map(async (doc) => {
             const job = { uid: doc.id, ...doc.data() };
 
-            const isToday = job.listDays.includes(dayCancel);
-            if (!isToday) return;
-
-            if (job.status==='Not Payment') {
+            if (job.status==='Not Payment' && job.listDays.includes(notPaymentDayCancel)) {
                 await JobService.putStatusByUID(job.uid, serviceType, 'Cancel');
                 await sendNotify(job.userID)
             } 
-            else if (job.status==='Hiring') {
+            else if (job.status==='Hiring' && job.listDays.includes(hiringDayCancel)) {
                 const snapshotOrders = await db.collection('orders').where('jobID', '==', job.uid).get();
                 let workerQuanity = 1;
                 if (serviceType==='HEALTHCARE') workerQuanity = job.workerQuanity;
@@ -94,7 +114,7 @@ const checkJob = (serviceType, collectionName, intervalRef) => {
                 ])
             }
         }))
-    }, 24*60*60000);
+    }, 500);
 }
 
 const checkCleaningJob = () => checkJob('CLEANING', 'cleaningJobs', { value: cleaningJobCancel });
