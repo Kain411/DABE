@@ -1,29 +1,11 @@
-const AccountService = require("../services/AccountService");
-const { findDevices } = require("./tool");
+const { createNotify, saveAndSendNotification } = require("./tool");
 
-const checkPaymentNotification = async (clientID, jobID, serviceType, amount) => {
-    const account = await AccountService.getByUID(clientID);
-    const role = account.role;
+const checkPaymentNotification = async (clientID, amount) => {
 
-    const notify = {
-        amount: amount,
-        jobID: jobID,
-        title: 'Thông báo thanh toán',
-        content: '',
-        isRead: false,
-        serviceType: serviceType,
-        createdAt: new Date(),
-        notificationType: 'Payment'
-    }
+    const content = `Bạn đã thanh toán thành công số tiền ${amount} VND.\nCông việc đã được đăng tải.`;
+    const notify = createNotify('Thanh toán thành công', content, clientID);
 
-    if (role==='worker') {
-        notify['content'] = `Công việc ${jobID} đã được thanh toán với số tiền ${amount}.\nVui lòng kiểm tra tanh toán...`;
-    }
-    else if (role==='user') {
-        notify['content'] = 'Bạn đã thanh toán thành công.\nCông việc đã được đăng tải.';
-    }
-
-    await findDevices(clientID, notify);
+    await saveAndSendNotification(notify);
 }
 
 module.exports = { checkPaymentNotification }

@@ -80,7 +80,6 @@ const putStatusByUID = async (req, res) => {
 
         const updatedOrder = await OrderService.putStatusByUID(uid, status);
 
-        console.log(updatedOrder)
         await orderStatusNotification(updatedOrder);
 
         return successDataResponse(res, 200, updatedOrder, 'updatedOrder');

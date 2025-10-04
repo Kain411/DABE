@@ -5,6 +5,7 @@ class OrderModel {
         this.uid = data.uid;
         this.workerID = data.workerID;
         this.jobID = data.jobID;
+        this.price = data.price;
         this.isReview = data.isReview;
         this.status = data.status;
         this.createdAt = formatDateAndTime(typeof data.createdAt.toDate==='function' ? data.createdAt.toDate() : data.createdAt);
@@ -18,9 +19,9 @@ class OrderModel {
             jobID: this.jobID,
             price: this.price,
             isReview: this.isReview,
-            isPayment: this.isPayment,
             status: this.status,
-            createdAt: this.createdAt
+            createdAt: this.createdAt,
+            serviceType: this.serviceType
         }
     }
 }

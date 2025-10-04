@@ -4,6 +4,10 @@ const NotificationModel = require("../models/NotificationModel");
 class NotificationService {
     constructor() {}
 
+    async createNotification(notify) {
+        await db.collection('notifications').add(notify);
+    }
+
     async getByClientID(clientID) {
         try {
             const snapshot = await db.collection('notifications').where('clientID', '==', clientID).get();

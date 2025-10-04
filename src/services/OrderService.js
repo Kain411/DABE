@@ -1,4 +1,5 @@
 const { db } = require("../config/firebase");
+const OrderModel = require("../models/OrderModel");
 const { formatDate, formatDateAndTime, formatDateAndTimeNow } = require("../utils/formatDate");
 const AccountService = require("./AccountService");
 const JobService = require("./JobService");
@@ -57,7 +58,6 @@ class OrderService {
                         price: doc.data().price,
                         status: doc.data().status,
                         isReview: doc.data().isReview,
-                        isPayment: doc.data().isPayment,
                         serviceType: doc.data().serviceType,
                         createdAt: formatDateAndTime(doc.data().createdAt.toDate())
                     }
@@ -89,7 +89,6 @@ class OrderService {
                     price: doc.data().price,
                     status: doc.data().status,
                     isReview: doc.data().isReview,
-                    isPayment: doc.data().isPayment,
                     serviceType: doc.data().serviceType,
                     createdAt: formatDateAndTime(doc.data().createdAt.toDate()),
                 }
@@ -125,7 +124,6 @@ class OrderService {
                     price: doc.data().price,
                     status: doc.data().status,
                     isReview: doc.data().isReview,
-                    isPayment: doc.data().isPayment,
                     serviceType: doc.data().serviceType,
                     createdAt: formatDateAndTimeNow(doc.data().createdAt.toDate()),
                 }
@@ -151,8 +149,9 @@ class OrderService {
         })
 
         const updatedOrder = await db.collection('orders').doc(uid).get();
+        const order = new OrderModel({ uid: updatedOrder.id, ...updatedOrder.data() })
 
-        return { uid: updatedOrder.id, ...updatedOrder.data() }
+        return order.getInfo()
     }
 
     async updatePayment(orderID) {

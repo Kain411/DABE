@@ -45,9 +45,8 @@ app.use('/api/notifications', NotificationRouter);
 const PaymentRouter = require('./src/routes/PaymentRouter');
 app.use('/api/payments', PaymentRouter);
 
-const { cleaningJobSchedule, healthcareJobSchedule } = require('./src/notifications/JobNotifications');
-cleaningJobSchedule();
-healthcareJobSchedule();
+const { jobScheduleAuto } = require('./src/notifications/JobNotifications');
+jobScheduleAuto();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -5,7 +5,6 @@ const OrderCreateValid = Joi.object({
     workerID: Joi.string().required(),
     status: Joi.string().default('Waiting'),
     isReview: Joi.boolean().default(false),
-    isPayment: Joi.boolean().default(false),
     serviceType: Joi.string().valid('CLEANING', 'HEALTHCARE', 'MAINTENANCE').required(),
     createdAt: Joi.date().default(new Date()),
 })

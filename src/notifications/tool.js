@@ -1,4 +1,15 @@
 const { db, admin } = require("../config/firebase");
+const NotificationService = require("../services/NotificationService");
+
+const createNotify = (title, content, clientID) => {
+    return {
+        title: title,
+        content: content,
+        clientID: clientID,
+        isRead: false,
+        createdAt: new Date()
+    }
+}
 
 const deleteFcmToken = async (response, clientID, devices) => {
     const tokens = [];
@@ -37,7 +48,16 @@ const findDevices = async (clientID, notify) => {
     }
 }
 
+const saveAndSendNotification = async (notify) => {
+    await Promise.all([
+        await NotificationService.createNotification(notify),
+        await findDevices(notify.clientID, notify.content)
+    ])
+}
+
 module.exports = {
+    createNotify,
     deleteFcmToken,
     findDevices,
+    saveAndSendNotification
 }

@@ -16,8 +16,6 @@ const checkPayment = async (req, res) => {
         return failResponse(res, 401, 'Không thành công');
     }
     else {
-        console.log(req.body);
-        
         const des = req.body.description.split('.')[3];
         const clientID = des.substring(0, 28);
         const jobID = des.substring(28, 48);
@@ -27,10 +25,11 @@ const checkPayment = async (req, res) => {
         try {
             const accountDoc = await AccountService.getByUID(clientID);
             if (accountDoc.role==='user') {
-                console.log('create Payment User')
-                await PaymentService.createPayment(clientID, jobID, amount, serviceType);
-                await JobService.putStatusByUID(jobID, serviceType, 'Hiring');
-                await checkPaymentNotification(clientID, jobID, serviceType, amount);
+                await Promise.all([
+                    PaymentService.createPayment(clientID, jobID, amount, serviceType),
+                    JobService.putStatusByUID(jobID, serviceType, 'Hiring'),
+                    checkPaymentNotification(clientID, amount)
+                ])
             }
         } catch (err) {
             console.log(err.message);

@@ -3,9 +3,10 @@ const { db } = require("../config/firebase");
 const JobService = require("../services/JobService");
 const OrderService = require("../services/OrderService");
 const TimeService = require("../services/TimeService");
-const { findDevices } = require("./tool");
+const { createNotify, saveAndSendNotification } = require("./tool");
 
 let cleaningJobInterval = null, healthcareJobInterval = null;
+const title = 'Thông báo công việc';
 
 const pad = (n) => n.toString().padStart(2, '0');
 
@@ -49,48 +50,27 @@ const getEndTime = async (startTime, uid, serviceType) => {
     return `${pad(hour)}:${minute}`;
 }
 
-const findWorkerAndNotify = async (job, notify) => {
+const findUserOfJob = async (job, content) => {
+
+    const notify = createNotify(title, content, job.userID)
+    await saveAndSendNotification(notify);
+}
+
+const findWorkerAndNotify = async (job, content) => {
     const snapshotOrder = await db.collection("orders").where('jobID', '==', job.uid).get();
     if (snapshotOrder.empty) return;
 
-    const docs = snapshotOrder.docs.filter(d => d.data().status != 'Rejected');
+    const docs = snapshotOrder.docs.filter(d => d.data().status==='Accepted' || d.data().status==='Processing');
     if (docs.length==0) return;
 
     await Promise.allSettled(docs.map(async (doc) => {
-        const order = { uid: doc.id, ...doc.data() };
         if (doc.data().status!=job.status) {
-            await OrderService.putStatusByUID(order.id, job.status);
+            await OrderService.putStatusByUID(doc.id, job.status);
         }
 
-        await db.collection('notifications').add({
-            ...notify,
-            clientID: order.workerID
-        });
-
-        await findDevices(order.workerID, notify);
+        const notify = createNotify(title, content, job.userID)
+        await saveAndSendNotification(notify);
     }))
-}
-
-const findUserOfJob = async (userID, notify) => {
-    await db.collection('notifications').add({
-        ...notify,
-        clientID: userID
-    });
-    
-    await findDevices(userID, notify);
-}
-
-const createNotification = (jobID, content, time, serviceType) => {
-    return {
-        jobID: jobID,
-        title: 'Thông báo công việc',
-        content: content,
-        time: time,
-        isRead: false,
-        serviceType: serviceType,
-        createdAt: new Date(),
-        notificationType: 'Job'
-    };
 }
 
 const jobSchedule = (serviceType, collectionName, intervalRef) => {
@@ -100,7 +80,7 @@ const jobSchedule = (serviceType, collectionName, intervalRef) => {
         
         const { date, time, time30 } = getTimeNotication();
 
-        const snapshot = await db.collection(collectionName).where('status', 'not-in', ['Completed']).get();
+        const snapshot = await db.collection(collectionName).where('status', 'not-in', ['Not Payment', 'Completed']).get();
 
         await Promise.all(snapshot.docs.map(async (doc) => {
             const job = { uid: doc.id, ...doc.data() }
@@ -113,20 +93,18 @@ const jobSchedule = (serviceType, collectionName, intervalRef) => {
                 else if (serviceType==='HEALTHCARE') {
                     endTime = await getEndTime(job.startTime, job.shiftID, job.serviceType);
                 }
-            } catch (errr) {
+            } catch (err) {
                 return;
             }
 
             const isToday = job.listDays.includes(date);
             if (!isToday) return;
 
+            let content = '';
+
             if (job.startTime===time30) {
-                const content = 'Công việc sẽ bắt đầu sau 30 phút.\n Vui lòng sắp xếp di chuyển để thực hiện công việc.';
-                const notify = createNotification(job.uid, content, job.startTime, serviceType);
-                await Promise.all([
-                    findWorkerAndNotify(job, notify),
-                    findUserOfJob(job.userID, notify)
-                ])
+                content = 'Công việc sẽ bắt đầu sau 30 phút.\n Vui lòng sắp xếp di chuyển để thực hiện công việc.';
+                
             }
             else if (job.startTime===time) {
                 if (job.status!=='Processing') {
@@ -134,12 +112,7 @@ const jobSchedule = (serviceType, collectionName, intervalRef) => {
                     await updateMetadataStatus(job.uid, 'Processing');
                     job['status'] = 'Processing';
                 }
-                const content = 'Công việc đã bắt đầu.';
-                const notify = createNotification(job.uid, content, job.startTime, serviceType);
-                await Promise.all([
-                    findWorkerAndNotify(job, notify),
-                    findUserOfJob(job.userID, notify)
-                ])
+                content = 'Công việc đã bắt đầu.';
             }
             else if (endTime===time) {
                 if (job.listDays.indexOf(date)===job.listDays.length-1) {
@@ -147,18 +120,24 @@ const jobSchedule = (serviceType, collectionName, intervalRef) => {
                     await updateMetadataStatus(job.uid, 'Completed');
                     job['status'] = 'Completed'
                 }
-                const content = 'Công việc đã kết thúc';
-                const notify = createNotification(job.uid, content, endTime, serviceType);
+                content = 'Công việc đã kết thúc';
+            }
+
+            if (content!=='') {
                 await Promise.all([
-                    findWorkerAndNotify(job, notify),
-                    findUserOfJob(job.userID, notify)
+                    findWorkerAndNotify(job, content),
+                    findUserOfJob(job, content)
                 ])
             }
         }))
     }, 60000);
+};
+
+const jobScheduleAuto = () => {
+    Promise.all([
+        jobSchedule('CLEANING', 'cleaningJobs', { value: cleaningJobInterval }),
+        jobSchedule('HEALTHCARE', 'healthcareJobs', { value: healthcareJobInterval })
+    ])
 }
 
-const cleaningJobSchedule = () => jobSchedule('CLEANING', 'cleaningJobs', { value: cleaningJobInterval });
-const healthcareJobSchedule = () => jobSchedule('HEALTHCARE', 'healthcareJobs', { value: healthcareJobInterval });
-
-module.exports = { cleaningJobSchedule, healthcareJobSchedule };
+module.exports = { jobScheduleAuto };
