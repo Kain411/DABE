@@ -62,13 +62,13 @@ const createJob = async (req, res) => {
         const validated = await config.validator.validateAsync(rawData, { stripUnknown: true });
         const job = await config.creator(validated);
 
-        const embed = await jobEmbed(job);
+        // const embed = await jobEmbed(job);
 
-        if (!embed) {
-            console.log(job)
-            await JobService.deleteJob(job.uid, job.serviceType);
-            return failResponse(res, 500, 'Embed job không thành công');
-        }
+        // if (!embed) {
+        //     console.log(job)
+        //     await JobService.deleteJob(job.uid, job.serviceType);
+        //     return failResponse(res, 500, 'Embed job không thành công');
+        // }
 
         return successDataResponse(res, 200, job, 'newJob');
     } catch (err) {
