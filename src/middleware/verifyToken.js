@@ -14,7 +14,7 @@ const verifyToken = async (req, res, next) => {
         req.client = decodedToken;
         next();
     } catch (error) {
-        return failResponse(res, 403, "Token không hợp lệ");
+        return failResponse(res, 401, "Token không hợp lệ");
     }
 }
 

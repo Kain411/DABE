@@ -12,9 +12,9 @@ const checkPermission = (roles) => {
     
         try {
             const decodedToken = await auth.verifyIdToken(idToken);
-            req.user = decodedToken;
+            req.client = decodedToken;
 
-            const accountDoc = await db.collection('accounts').doc(req.user.uid).get();
+            const accountDoc = await db.collection('accounts').doc(req.client.uid).get();
             if (!accountDoc.exists) {
                 return failResponse(res, 400, "Không tìm thấy thông tin");
             }
@@ -27,7 +27,7 @@ const checkPermission = (roles) => {
 
             next();
         } catch (error) {
-            return failResponse(res, 403, "Token không hợp lệ");
+            return failResponse(res, 401, "Token không hợp lệ");
         }
     }
 }
