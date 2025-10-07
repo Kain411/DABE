@@ -14,9 +14,7 @@ class ScheduleService {
             const db_name = `${order.serviceType.toLowerCase()}Jobs`;
             const jobDoc = await db.collection(db_name).doc(order.jobID).get();
 
-            console.log(date)
             if (jobDoc.exists && jobDoc.data().listDays.includes(date)) {
-                console.log('in')
                 const job = await JobService.getJob(jobDoc.id, jobDoc.data());
                 result.push(job);
             }

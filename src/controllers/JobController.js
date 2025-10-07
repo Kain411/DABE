@@ -11,7 +11,7 @@ dayjs.extend(customParseFormat);
 const jobEmbed = async (job) => {
     if (job.serviceType==='HEALTHCARE') {
         job.services = await Promise.all(job.services.map(async (service) => {
-            const doc = await ServiceService.getHealthcareServiceByUID(service.serviceID);
+            const doc = await ServiceService.getHealthcareServiceByUID(service.uid);
             return {
                 ...service,
                 serviceName: doc.serviceName
@@ -23,7 +23,8 @@ const jobEmbed = async (job) => {
             const doc = await ServiceService.getMaintenanceServiceByUID(service.uid);
             return {
                 ...service,
-                serviceName: doc.serviceName
+                serviceName: doc.serviceName,
+                maintenance: doc.maintenance
             }
         }))
     }
@@ -63,7 +64,11 @@ const createJob = async (req, res) => {
 
         // const embed = await jobEmbed(job);
 
-        // if (!embed) return failResponse(res, 500, 'Embed job không thành công');
+        // if (!embed) {
+        //     console.log(job)
+        //     await JobService.deleteJob(job.uid, job.serviceType);
+        //     return failResponse(res, 500, 'Embed job không thành công');
+        // }
 
         return successDataResponse(res, 200, job, 'newJob');
     } catch (err) {

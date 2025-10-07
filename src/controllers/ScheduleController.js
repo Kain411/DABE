@@ -3,7 +3,7 @@ const { failResponse, successDataResponse } = require("../utils/response");
 
 const getScheduleOfWorker = async (req, res) => {
     try {
-        const { workerID } = req.client.uid;
+        const workerID = req.client.uid;
         const { date } = req.query;
 
         const result = await ScheduleService.getScheduleOfWorker(workerID, date);

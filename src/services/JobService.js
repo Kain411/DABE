@@ -17,6 +17,32 @@ class JobService {
         return false;
     }
 
+    async deleteJob(uid, serviceType) {
+        const db_name = `${serviceType.toLowerCase()}Jobs`;
+
+        const job = await db.collection(db_name).doc(uid).get();
+
+        if (serviceType==='HEALTHCARE') {
+            await Promise.all(job.services.forEach(async (healthcareDetailID) => {
+                await db.collection('healthcareDetails').doc(healthcareDetailID).delete();
+            }))
+        }
+        else if (serviceType==='MAINTENANCE') {
+            await Promise.all(job.services.forEach(async (maintenanceDetailID) => {
+                const maintenanceDetails = await db.collection('maintenanceDetails').doc(maintenanceDetailID).get();
+
+                for (const powerQuantityID of maintenanceDetails.powers) {
+                    await db.collection('powerQuantities').doc(powerQuantityID).delete();
+                }
+
+                await db.collection('maintenanceDetails').doc(maintenanceDetailID).delete();
+            }))
+        }
+
+        await db.collection(db_name).doc(uid).delete();
+        console.log('Delete success');
+    }
+
     async createCleaningJob(validated) {
         try {            
             const newJob = {
