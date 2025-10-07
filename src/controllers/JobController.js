@@ -1,10 +1,12 @@
 const dayjs = require('dayjs');
 const JobService = require("../services/JobService");
-const { failResponse, successDataResponse } = require("../utils/response");
+const { failResponse, successDataResponse, successResponse } = require("../utils/response");
 const { CleaningJobCreateValid, HealthcareJobCreateValid, MaintenanceJobCreateValid } = require("../utils/validator/JobValid");
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 const ServiceService = require('../services/ServiceService');
 const { jobEmbedding } = require('../ai/Embedding');
+const OrderService = require('../services/OrderService');
+const { saveAndSendNotification, createNotify } = require('../notifications/tool');
 
 dayjs.extend(customParseFormat);
 
@@ -125,10 +127,36 @@ const getJobsByServiceType = async (req, res) => {
     }
 }
 
+const cancelJob = async (req, res) => {
+    try {
+        console.log('in')
+        const { jobID, serviceType } = req.params;
+
+        const orders = await OrderService.getOrdersByJobID(jobID);
+        await Promise.all(orders.map(async (doc) => {
+            console.log(doc)
+            const order = await OrderService.putStatusByUID(doc.uid, 'Cancel');
+            const notify = createNotify(
+                'Thông báo công việc',
+                'Công việc đã bị hủy',
+                doc.worker.uid
+            )
+            await saveAndSendNotification(notify);
+        }))
+        await JobService.putStatusByUID(jobID, serviceType, 'Cancel');
+
+        return successResponse(res, 200, 'Thành công');
+    } catch (err) {
+        console.log(err.message);
+        return failResponse(res, 500, err.message);
+    }
+}
+
 module.exports = {
     createJob,
     getJobNew,
     getByUID,
     getJobsByUserID,
     getJobsByServiceType,
+    cancelJob
 }
