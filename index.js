@@ -48,13 +48,13 @@ app.use('/api/payments', PaymentRouter);
 const { cleaningJobSchedule, healthcareJobSchedule } = require('./src/notifications/JobNotifications');
 const { checkCleaningJob, checkHealthcareJob, checkMaintenanceJob } = require('./src/notifications/JobCancel');
 
-Promise.all([
-    cleaningJobSchedule(),
-    healthcareJobSchedule(),
-    checkCleaningJob(),
-    checkHealthcareJob(),
-    checkMaintenanceJob()
-])
+// Promise.all([
+//     cleaningJobSchedule(),
+//     healthcareJobSchedule(),
+//     checkCleaningJob(),
+//     checkHealthcareJob(),
+//     checkMaintenanceJob()
+// ])
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

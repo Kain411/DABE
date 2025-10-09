@@ -114,7 +114,7 @@ const checkJob = (serviceType, collectionName, intervalRef) => {
                 ])
             }
         }))
-    }, 500);
+    }, 24*60*60000);
 }
 
 const checkCleaningJob = () => checkJob('CLEANING', 'cleaningJobs', { value: cleaningJobCancel });
