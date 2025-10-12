@@ -8,8 +8,11 @@ const search = async (req, res ) => {
         const { query } = req.body;
 
         console.log(query)
+        console.log(process.env.AI_URL)
 
         const response = await axios.post(`${process.env.AI_URL}/chatbox`, { query: query })
+
+        console.log(response.data)
 
         return ressponseAI(res, 200, response.data);
 
