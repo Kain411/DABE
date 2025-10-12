@@ -20,4 +20,10 @@ const failResponse = (res, code, error) => {
     })
 }
 
-module.exports = { successDataResponse, successResponse, failResponse }
+const ressponseAI = (res, code, data) => {
+    return res.status(code).json({
+        ...data
+    })
+}
+
+module.exports = { successDataResponse, successResponse, failResponse, ressponseAI }

@@ -45,6 +45,9 @@ app.use('/api/notifications', NotificationRouter);
 const PaymentRouter = require('./src/routes/PaymentRouter');
 app.use('/api/payments', PaymentRouter);
 
+const ChatBoxRouter = require('./src/routes/ChatBoxRouter');
+app.use('/api/chatbox', ChatBoxRouter);
+
 const { cleaningJobSchedule, healthcareJobSchedule } = require('./src/notifications/JobNotifications');
 const { checkCleaningJob, checkHealthcareJob, checkMaintenanceJob } = require('./src/notifications/JobCancel');
 
