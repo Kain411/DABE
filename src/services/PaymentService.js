@@ -37,6 +37,25 @@ class PaymentService {
             throw new Error('Không tìm thấy payments');
         }
     }
+
+    async getPaymentsUser(userID) {
+        try {
+            const snapshot = await db.collection('payments').where('userID', '==', userID).get();
+            const payments = [];
+
+            snapshot.docs.map(doc => {
+                payments.push(
+                    (new PaymentModel({ uid: doc.id, ...doc.data() })).getInfo()
+                )
+            })
+
+            return payments;
+
+        } catch (err) {
+            console.log(err.message);
+            throw new Error('Không tìm thấy payments');
+        }
+    }
 }
 
 module.exports = new PaymentService();

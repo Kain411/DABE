@@ -9,6 +9,6 @@ router.post('/check-payment', checkPayment);
 
 router.post('/check-payment/:orderID', verifyToken, checkPermission(['admin']), checkPaymentAdmin);
 
-router.get('', verifyToken, checkPermission(['admin']), getPayments)
+router.get('', verifyToken, checkPermission(['admin', 'user']), getPayments)
 
 module.exports = router;

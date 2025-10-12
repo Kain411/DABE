@@ -63,7 +63,11 @@ const checkPaymentAdmin = async (req, res) => {
 
 const getPayments = async (req, res) => {
     try {
-        const payments = await PaymentService.getPayments();
+        const { role, uid } = req.client;
+
+        let payments;
+        if (role==='admin') payments = await PaymentService.getPayments();
+        else if (role==='user') payments = await PaymentService.getPaymentsUser(uid);
 
         return successDataResponse(res, 200, payments, 'payments');
     } catch (err) {
