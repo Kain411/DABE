@@ -4,6 +4,7 @@ const { OrderCreateValid } = require("../utils/validator/OrderValid");
 
 const { orderStatusNotification } = require("../notifications/OrderNotification");
 const JobService = require("../services/JobService");
+const AccountService = require("../services/AccountService");
 
 const createOrder = async (req, res) => {
     try {
@@ -94,9 +95,12 @@ const checkOrderQuantity = async (uid) => {
 
 const putStatusByUID = async (req, res) => {
     try {
+        const clientID = req.client.uid;
         const { uid, status } = req.body;
 
-        if (status!=='Accepted' && status!=='Rejected') {
+        const account = await AccountService.getByUID(clientID)
+
+        if (status!=='Accepted' && status!=='Rejected' && status!=='Cancel') {
             failResponse(res, 401, 'Sai trạng thái');
         }
 
@@ -104,6 +108,13 @@ const putStatusByUID = async (req, res) => {
         if (status==='Accepted') {
             check = await checkOrderQuantity(uid);
         }
+
+        if (status==='Cancel' && account.role==='worker') {
+            const order = await OrderService.getByUID(uid);
+            if (order.status!=='Waiting') {
+                return failResponse(res, 200, 'Bạn không thể hủy order khi không ở trạng thái Chờ (Waiting)')
+            }
+        } 
 
         if (check) {
             const updatedOrder = await OrderService.putStatusByUID(uid, status);
