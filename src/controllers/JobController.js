@@ -5,6 +5,7 @@ const { CleaningJobCreateValid, HealthcareJobCreateValid, MaintenanceJobCreateVa
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 const OrderService = require('../services/OrderService');
 const { saveAndSendNotification, createNotify } = require('../notifications/tool');
+const { deleteJob } = require('../ai/Embedding');
 
 dayjs.extend(customParseFormat);
 
@@ -99,6 +100,7 @@ const cancelJob = async (req, res) => {
         const { jobID, serviceType } = req.params;
 
         const orders = await OrderService.getOrdersByJobID(jobID);
+        await deleteJob(jobID);
         await Promise.all(orders.map(async (doc) => {
             console.log(doc)
             const order = await OrderService.putStatusByUID(doc.uid, 'Cancel');
