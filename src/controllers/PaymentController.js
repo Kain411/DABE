@@ -5,6 +5,34 @@ const PaymentService = require("../services/PaymentService");
 const { failResponse, successDataResponse, successResponse } = require("../utils/response");
 const JobService = require("../services/JobService");
 const OrderService = require("../services/OrderService");
+const ServiceService = require("../services/ServiceService");
+
+const getJob = async (jobID, serviceType) => {
+
+    const job = await JobService.getByUID(jobID, serviceType);
+    
+    if (job.serviceType==='HEALTHCARE') {
+        job.services = await Promise.all(job.services.map(async (service) => {
+            const doc = await ServiceService.getHealthcareServiceByUID(service.uid);
+            return {
+                ...service,
+                serviceName: doc.serviceName
+            }
+        }))
+    }
+    else if (job.serviceType==='MAINTENANCE') {
+        job.services = await Promise.all(job.services.map(async (service) => {
+            const doc = await ServiceService.getMaintenanceServiceByUID(service.uid);
+            return {
+                ...service,
+                serviceName: doc.serviceName,
+                maintenance: doc.maintenance
+            }
+        }))
+    }
+
+    await jobEmbedding(job);
+}
 
 const checkPayment = async (req, res) => {
 
@@ -23,6 +51,7 @@ const checkPayment = async (req, res) => {
         const amount = req.body.transferAmount;
 
         try {
+            await getJob(jobID, serviceType);
             const accountDoc = await AccountService.getByUID(clientID);
             if (accountDoc.role==='user') {
                 await Promise.all([

@@ -1,3 +1,4 @@
+const { deleteJob } = require("../ai/Embedding");
 const { db } = require("../config/firebase");
 const JobService = require("../services/JobService");
 const OrderService = require("../services/OrderService");
@@ -90,7 +91,8 @@ const checkJob = (serviceType, collectionName, intervalRef) => {
 
             if (job.status==='Not Payment' && job.listDays.includes(notPaymentDayCancel)) {
                 await JobService.putStatusByUID(job.uid, serviceType, 'Cancel');
-                await sendNotify(job.userID)
+                await deleteJob(job.uid);
+                await sendNotify(job.userID);
             } 
             else if (job.status==='Hiring' && job.listDays.includes(hiringDayCancel)) {
                 const snapshotOrders = await db.collection('orders').where('jobID', '==', job.uid).get();
@@ -102,6 +104,7 @@ const checkJob = (serviceType, collectionName, intervalRef) => {
 
                 await Promise.all([
                     await JobService.putStatusByUID(job.uid, serviceType, 'Cancel'),
+                    await deleteJob(job.uid),
                     await sendNotify(job.userID),
                     snapshotOrders.docs.map(async (orderDoc) => {
                         const order = { uid: orderDoc.id, ...orderDoc.data() };

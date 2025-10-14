@@ -1,4 +1,4 @@
-const { updateMetadataStatus } = require("../ai/Embedding");
+const { updateMetadataStatus, deleteJob } = require("../ai/Embedding");
 const { db } = require("../config/firebase");
 const JobService = require("../services/JobService");
 const OrderService = require("../services/OrderService");
@@ -111,7 +111,7 @@ const jobSchedule = (serviceType, collectionName, intervalRef) => {
             else if (job.startTime===time) {
                 if (job.status!=='Processing') {
                     await JobService.putStatusByUID(job.uid, job.serviceType, 'Processing');
-                    await updateMetadataStatus(job.uid, 'Processing');
+                    await deleteJob(job.uid);
                     job['status'] = 'Processing';
                 }
                 content = 'Công việc đã bắt đầu.';
@@ -119,7 +119,6 @@ const jobSchedule = (serviceType, collectionName, intervalRef) => {
             else if (endTime===time) {
                 if (job.listDays.indexOf(date)===job.listDays.length-1) {
                     await JobService.putStatusByUID(job.uid, job.serviceType, 'Completed');
-                    await updateMetadataStatus(job.uid, 'Completed');
                     job['status'] = 'Completed'
                 }
                 content = 'Công việc đã kết thúc';

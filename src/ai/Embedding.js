@@ -1,21 +1,19 @@
 const { default: axios } = require("axios");
-
-const host = 'http://127.0.0.1:5000/api';
+const dotenv = require('dotenv');
+dotenv.config();
 
 const jobEmbedding = async (job) => {
     try {
-        const response = await axios.post(`${host}/job-embedding`, job)
+        const response = await axios.post(`${process.env.AI_URL}/job-embedding`, job)
 
-        return true;
     } catch (err) {
         console.log(err.message);
-        return false;
     }
 }
 
 const updateMetadataStatus = async (jobID, status) => {
     try {
-        const response = await axios.put(`${host}/update-metadata/status`,
+        const response = await axios.put(`${process.env.AI_URL}/update-metadata/status`,
             {
                 uid: jobID,
                 status: status
@@ -29,7 +27,19 @@ const updateMetadataStatus = async (jobID, status) => {
     }
 }
 
+const deleteJob = async (jobID) => {
+    try {
+        const response = await axios.delete(`${process.env.AI_URL}/job/${jobID}`)
+
+        console.log(response);
+
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
 module.exports = {
     jobEmbedding,
-    updateMetadataStatus
+    updateMetadataStatus,
+    deleteJob
 }
