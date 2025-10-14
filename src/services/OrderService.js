@@ -121,12 +121,9 @@ class OrderService {
 
             const orders = [];
             await Promise.all(snapshot.docs.map(async (doc) => {
-                if (doc.data().status!=='Waiting' && doc.data().status!=='Accepted') return;
-                const accountDoc = await AccountService.getByUID(doc.data().workerID);
+                console.log(doc.data())
+                if (doc.data().status!=='Waiting' && doc.data().status!=='Accepted' && doc.data().status!=='Completed') return;
                 const workerDoc = await WorkerService.getByUID(doc.data().workerID);
-                workerDoc['dob'] = formatDate(typeof workerDoc.dob.toDate === 'function' ? workerDoc.dob.toDate() : workerDoc.dob)
-                workerDoc['email'] = accountDoc.email;
-                workerDoc['role'] = accountDoc.role;
 
                 const tmp = {
                     uid: doc.id,
