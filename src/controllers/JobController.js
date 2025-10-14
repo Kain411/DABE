@@ -3,8 +3,6 @@ const JobService = require("../services/JobService");
 const { failResponse, successDataResponse, successResponse } = require("../utils/response");
 const { CleaningJobCreateValid, HealthcareJobCreateValid, MaintenanceJobCreateValid } = require("../utils/validator/JobValid");
 const customParseFormat = require("dayjs/plugin/customParseFormat");
-const ServiceService = require('../services/ServiceService');
-const { jobEmbedding } = require('../ai/Embedding');
 const OrderService = require('../services/OrderService');
 const { saveAndSendNotification, createNotify } = require('../notifications/tool');
 

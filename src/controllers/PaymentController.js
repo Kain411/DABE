@@ -6,6 +6,7 @@ const { failResponse, successDataResponse, successResponse } = require("../utils
 const JobService = require("../services/JobService");
 const OrderService = require("../services/OrderService");
 const ServiceService = require("../services/ServiceService");
+const { jobEmbedding } = require("../ai/Embedding");
 
 const getJob = async (jobID, serviceType) => {
 
