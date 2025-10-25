@@ -18,6 +18,7 @@ class WorkerService {
             const workerData = workerDoc.data();
             workerData['email'] = accountDoc.email;
             workerData['role'] = accountDoc.role;
+            workerData['provider'] = accountDoc.provider
 
             const worker = new WorkerModel({ uid: uid, ...workerData })
 

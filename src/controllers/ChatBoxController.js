@@ -7,7 +7,6 @@ const search = async (req, res ) => {
     try {
         const { query } = req.body;
 
-        console.log(req.client)
 
         console.log(process.env.AI_URL)
 

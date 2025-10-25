@@ -18,6 +18,7 @@ class AdminService {
             const adminData = adminDoc.data();
             adminData['email'] = accountDoc.email;
             adminData['role'] = accountDoc.role;
+            adminData['provider'] = accountDoc.provider
 
             const admin = new AdminModel({ uid: uid, ...adminData })
 

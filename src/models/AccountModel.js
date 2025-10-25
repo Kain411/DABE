@@ -4,6 +4,7 @@ class AccountModel {
         this.email = data.email;
         this.role = data.role;
         this.provider = data.provider;
+        this.ban = data.ban
     }
 
     getInfo() {
@@ -11,7 +12,8 @@ class AccountModel {
             uid: this.uid,
             email: this.email,
             role: this.role,
-            provider: this.provider
+            provider: this.provider,
+            ban: this.ban
         }
     }
 }

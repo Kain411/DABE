@@ -1,6 +1,5 @@
 const { db } = require("../config/firebase");
 const { UserModel } = require("../models/ClientModel");
-const { formatDate } = require("../utils/formatDate");
 const AccountService = require("./AccountService");
 
 class UserService {
@@ -18,6 +17,7 @@ class UserService {
             const userData = userDoc.data();
             userData['email'] = accountDoc.email;
             userData['role'] = accountDoc.role;
+            userData['provider'] = accountDoc.provider
 
             const user = new UserModel({ uid: uid, ...userData });
 

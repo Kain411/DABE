@@ -4,6 +4,22 @@ const AccountModel = require("../models/AccountModel");
 class AccountService {
     constructor() {}
 
+    async getAccounts() {
+        try {  
+            const snapshot = await db.collection('accounts').get();
+
+            const accounts = [];
+            snapshot.docs.map(doc => {
+                accounts.push((new AccountModel({ uid: doc.id, ...doc.data() })).getInfo());
+            })
+
+            return accounts;
+
+        } catch (err) {
+            throw new Error("Không thể get")
+        }
+    }
+
     async getByUID(uid) {
         try {
             const accountDoc = await db.collection('accounts').doc(uid).get();

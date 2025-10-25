@@ -45,6 +45,9 @@ app.use('/api/notifications', NotificationRouter);
 const PaymentRouter = require('./src/routes/PaymentRouter');
 app.use('/api/payments', PaymentRouter);
 
+const PolicyRouter = require('./src/routes/PolicyRouter');
+app.use('/api/policies', PolicyRouter);
+
 const ChatBoxRouter = require('./src/routes/ChatBoxRouter');
 app.use('/api/chatbox', ChatBoxRouter);
 
