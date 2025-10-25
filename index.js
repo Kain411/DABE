@@ -48,8 +48,8 @@ app.use('/api/payments', PaymentRouter);
 const PolicyRouter = require('./src/routes/PolicyRouter');
 app.use('/api/policies', PolicyRouter);
 
-const ChatBoxRouter = require('./src/routes/ChatBoxRouter');
-app.use('/api/chatbox', ChatBoxRouter);
+const ChatBotRouter = require('./src/routes/ChatBotRouter');
+app.use('/api/chatbot', ChatBotRouter);
 
 const { cleaningJobSchedule, healthcareJobSchedule } = require('./src/notifications/JobNotifications');
 const { checkCleaningJob, checkHealthcareJob, checkMaintenanceJob } = require('./src/notifications/JobCancel');
