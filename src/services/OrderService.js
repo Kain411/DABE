@@ -80,7 +80,7 @@ class OrderService {
             return orders;
         } catch (err) {
             console.log(err.message);
-            throw new Error("Get order không thành công")
+            throw new Error(err.message)
         }
     }
 
@@ -111,7 +111,7 @@ class OrderService {
             return orders;
         } catch (err) {
             console.log(err.message);
-            throw new Error("Thất bại")
+            throw new Error(err.message)
         }
     }
 
@@ -146,7 +146,7 @@ class OrderService {
             return orders;
         } catch (err) {
             console.log(err.message);
-            throw new Error("Thất bại")
+            throw new Error(err.message)
         }
     }
 

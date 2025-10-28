@@ -24,9 +24,13 @@ const search = async (req, res ) => {
             }
         )
 
-        console.log(response.data)
+        console.log(response)
 
-        return ressponseAI(res, 200, response.data.output);
+        let result = response.data;
+
+        if ("output" in result) result = result.data;
+
+        return ressponseAI(res, 200, result);
 
     } catch (err) {
         return failResponse(res, 500, err.message);

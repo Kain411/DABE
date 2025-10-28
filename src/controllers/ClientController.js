@@ -85,7 +85,7 @@ const updateClient = async (req, res) => {
         }
         else if (req.body.role==='worker') {
             const validated = await WorkerValid.validateAsync(rawData, { stripUnknown: true });
-            clientData = await WorkerService.updateUser(validated);
+            clientData = await WorkerService.updateWorker(validated);
         }
         else if (req.body.role==='admin') {
             const validated = await AdminValid.validateAsync(rawData, { stripUnknown: true });
