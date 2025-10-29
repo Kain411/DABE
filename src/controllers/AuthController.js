@@ -41,6 +41,7 @@ const getClient = async (account) => {
 const getMe = async (req, res) => {
     try {
         const { email, password } = req.body;
+
         const response = await axios.post(
             `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FB_API_KEY}`,
             { email, password, returnSecureToken: true }
