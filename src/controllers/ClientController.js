@@ -6,6 +6,7 @@ const { UserValid, WorkerValid, AdminValid } = require("../utils/validator/Clien
 const { ForgotPasswordValid, ChangePasswordValid } = require("../utils/validator/AuthValid");
 const { auth } = require("../config/firebase");
 const AccountService = require("../services/AccountService");
+const { formatDate } = require("../utils/formatDate");
 
 const getClients = async (req, res) => {
     try {
@@ -91,6 +92,7 @@ const updateClient = async (req, res) => {
             const validated = await AdminValid.validateAsync(rawData, { stripUnknown: true });
             clientData = await AdminService.updateAdmin(validated);
         }
+        clientData['dob'] = formatDate(typeof clientData['dob']==='function' ? clientData['dob'].toDate() : clientData['dob'])
         clientData["email"] = req.body.email;
         clientData["role"] = req.body.role;
         return successDataResponse(res, 200, clientData, 'user')
