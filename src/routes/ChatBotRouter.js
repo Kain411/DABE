@@ -3,8 +3,9 @@ const router = express.Router();
 
 const { search } = require('../controllers/ChatBotController');
 const { verifyToken } = require('../middleware/verifyToken');
+const { checkPermission } = require('../middleware/checkPermission');
 
-// router.post('', verifyToken, search);
-router.post('', search);
+router.post('', verifyToken, checkPermission(['user', 'worker']), search);
+// router.post('', search);
 
 module.exports = router;

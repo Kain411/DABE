@@ -2,12 +2,46 @@ const { default: axios } = require("axios");
 const { failResponse, ressponseAI } = require("../utils/response");
 const dotenv = require('dotenv');
 const { ref } = require("joi");
+const AccountService = require("../services/AccountService");
+const UserService = require("../services/UserService");
+const WorkerService = require("../services/WorkerService");
+const ReviewService = require("../services/ReviewService");
 dotenv.config();
 
 const search = async (req, res ) => {
     try {
-        const { query, reference } = req.body;
+        const { query } = req.body;
+        const clientID = req.client.uid;
+        const role = req.client.role;
 
+        let reference = {};
+        if (role==='user') {
+            const clientData = await UserService.getByUID(clientID);
+            reference['location'] = clientData.location;
+        }
+        else if (role==='worker') {
+            const clientData = await WorkerService.getByUID(clientID);
+            reference['location'] = clientData.location;
+        }
+
+        if (role==='worker') {
+            const experiencesData = await ReviewService.getExperienceOfWorker(clientID);
+
+            const experiences = {
+                'CLEANING': 0,
+                'HEALTHCARE': 0,
+                'MAINTENANCE': 0
+            };
+            for (const type in experiencesData) {
+                if (experiencesData[type]?.rating !== undefined) {
+                    experiences[type] = experiencesData[type].rating;
+                }
+            }
+
+            reference['experiences'] = experiences;
+        }
+
+        console.log(reference)
 
         console.log(process.env.AI_URL)
 

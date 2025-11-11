@@ -25,6 +25,8 @@ const checkPermission = (roles) => {
                 return failResponse(res, 403, "Không được phép truy cập");
             }
 
+            req.client.role = accountData.role;
+
             next();
         } catch (error) {
             return failResponse(res, 401, "Token không hợp lệ");

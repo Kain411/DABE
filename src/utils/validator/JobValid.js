@@ -31,7 +31,7 @@ const HealthcareJobValid = JobValid.keys({
     services: Joi.array().items(
         Joi.object({
             uid: Joi.string().required(),
-            quantity: Joi.number().valid(1, 2).required()
+            quantity: Joi.number().required()
         })
     ).min(1).required()
 })

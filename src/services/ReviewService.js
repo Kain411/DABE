@@ -33,6 +33,10 @@ class ReviewService {
                     stars: [],
                     reviews: []
                 },
+                'MAINTENENCE': {
+                    stars: [],
+                    reviews: []
+                }
             };
 
             const snapshot = await db.collection('reviews').where('workerID', '==', workerID).get();
