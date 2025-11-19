@@ -60,6 +60,8 @@ class JobService {
                 createdAt: new Date(),
                 status: validated.status,
                 location: validated.location,
+                lat: validated.lat,
+                lon: validated.lon,
                 durationID: validated.duration.uid,
                 isCooking: validated.isCooking,
                 isIroning: validated.isIroning,
@@ -97,6 +99,8 @@ class JobService {
                 createdAt: new Date(), 
                 status: validated.status,
                 location: validated.location,
+                lat: validated.lat,
+                lon: validated.lon,
                 shiftID: validated.shift.uid,
                 services: healthcareDetailIDs
             }
@@ -142,6 +146,8 @@ class JobService {
                 createdAt: new Date(), 
                 status: validated.status,
                 location: validated.location,
+                lat: validated.lat,
+                lon: validated.lon,
                 services: serviceIDs
             }
 
