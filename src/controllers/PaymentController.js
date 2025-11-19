@@ -32,7 +32,11 @@ const getJob = async (jobID, serviceType) => {
         }))
     }
 
-    await jobEmbedding(job);
+    if (job.status==='Not Payment') {
+        await jobEmbedding(job);
+        return true;
+    }
+    return false;
 }
 
 const checkPayment = async (req, res) => {
@@ -52,14 +56,16 @@ const checkPayment = async (req, res) => {
         const amount = req.body.transferAmount;
 
         try {
-            await getJob(jobID, serviceType);
-            const accountDoc = await AccountService.getByUID(clientID);
-            if (accountDoc.role==='user') {
-                await Promise.all([
-                    PaymentService.createPayment(clientID, jobID, amount, serviceType),
-                    JobService.putStatusByUID(jobID, serviceType, 'Hiring'),
-                    checkPaymentNotification(clientID, amount)
-                ])
+            const isPayment = await getJob(jobID, serviceType);
+            if (isPayment) {
+                const accountDoc = await AccountService.getByUID(clientID);
+                if (accountDoc.role==='user') {
+                    await Promise.all([
+                        PaymentService.createPayment(clientID, jobID, amount, serviceType),
+                        JobService.putStatusByUID(jobID, serviceType, 'Hiring'),
+                        checkPaymentNotification(clientID, amount)
+                    ])
+                }
             }
         } catch (err) {
             console.log(err.message);
