@@ -21,6 +21,8 @@ const search = async (req, res ) => {
         //     reference['location'] = clientData.location;
         // }
 
+        reference['role'] = role;
+
         if (role==='worker') {
             const experiencesData = await ReviewService.getExperienceOfWorker(clientID);
 
