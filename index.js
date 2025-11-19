@@ -53,6 +53,7 @@ app.use('/api/chatbot', ChatBotRouter);
 
 const { cleaningJobSchedule, healthcareJobSchedule } = require('./src/notifications/JobNotifications');
 const { checkCleaningJob, checkHealthcareJob, checkMaintenanceJob } = require('./src/notifications/JobCancel');
+const { getLatLon } = require('./src/utils/getLatLon');
 
 // Promise.all([
 //     cleaningJobSchedule(),
@@ -61,6 +62,10 @@ const { checkCleaningJob, checkHealthcareJob, checkMaintenanceJob } = require('.
 //     checkHealthcareJob(),
 //     checkMaintenanceJob()
 // ])
+
+// getLatLon("Phường Bình Hòa, Thuận An, Thành phố Hồ Chí Minh, Việt Nam")
+// getLatLon("181 Ng. 634 Đ. Kim Giang, Thanh Liệt, Thanh Trì, Hà Nội, Việt Nam")
+getLatLon("Số 40, phố Nhà Thờ, Phường Hàng Trống, Quận Hoàn Kiếm, Hà Nội")
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

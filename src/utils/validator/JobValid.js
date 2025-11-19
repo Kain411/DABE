@@ -7,6 +7,8 @@ const JobValid = Joi.object({
     listDays: Joi.array().items(Joi.string()).min(1).required(),
     status: Joi.string().default('Not Payment'),
     location: Joi.string().required(),
+    lat: Joi.string().required(),
+    lon: Joi.string().required()
 })
 
 

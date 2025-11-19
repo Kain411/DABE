@@ -10,6 +10,8 @@ class JobModel {
         this.status = data.status;
         this.serviceType = data.serviceType;
         this.location = data.location;
+        this.lat = data.lat;
+        this.lon = data.lon;
         this.createdAt = formatDate(typeof data.createdAt.toDate==='function' ? data.createdAt.toDate() : data.createdAt);
     }
 

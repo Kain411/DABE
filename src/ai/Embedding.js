@@ -1,5 +1,6 @@
 const { default: axios } = require("axios");
 const dotenv = require('dotenv');
+const { getLatLon } = require("../utils/getLatLon");
 dotenv.config();
 
 const jobEmbedding = async (job) => {
