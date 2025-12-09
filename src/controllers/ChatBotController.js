@@ -105,7 +105,6 @@ const search = async (req, res ) => {
         const clientID = req.client.uid;
         const role = req.client.role;
 
-        reference['session_id'] = clientID;
         reference['role'] = role;
 
         const [experiences, jobs] = await Promise.all([
@@ -123,7 +122,7 @@ const search = async (req, res ) => {
 
         const response = await axios.post(
             `${process.env.AI_URL}/chatbot`, 
-            { query: query, reference: reference },
+            { query: query, reference: reference, session_id: clientID },
             {
                 headers: {
                     'Content-Type': 'apllication/json; charset=utf-8',
