@@ -34,24 +34,22 @@ const getJob = async (jobID, serviceType) => {
     return job;
 }
 
-const getExperienceOfWorker = async (role, clientID) => {
+const getExperienceOfWorker = async (clientID) => {
     try {
-        if (role=='worker') {
-            const experiencesData = await ReviewService.getExperienceOfWorker(clientID);
+        const experiencesData = await ReviewService.getExperienceOfWorker(clientID);
 
-            const experiences = {
-                'CLEANING': 0,
-                'HEALTHCARE': 0,
-                'MAINTENANCE': 0
-            };
-            for (const type in experiencesData) {
-                if (experiencesData[type]?.rating !== undefined) {
-                    experiences[type] = experiencesData[type].rating;
-                }
+        const experiences = {
+            'CLEANING': 0,
+            'HEALTHCARE': 0,
+            'MAINTENANCE': 0
+        };
+        for (const type in experiencesData) {
+            if (experiencesData[type]?.rating !== undefined) {
+                experiences[type] = experiencesData[type].rating;
             }
-
-            return experiences;
         }
+
+        return experiences;
 
         return [];
     } catch (err) {
@@ -107,13 +105,15 @@ const search = async (req, res ) => {
 
         reference['role'] = role;
 
-        const [experiences, jobs] = await Promise.all([
-                getExperienceOfWorker(role, clientID),
+        if (role=='worker') {
+            const [experiences, jobs] = await Promise.all([
+                getExperienceOfWorker(clientID),
                 getJobs(clientID)
-        ])
+            ])
 
-        reference['experiences'] = experiences;
-        reference['jobs'] = jobs;
+            reference['experiences'] = experiences;
+            reference['jobs'] = jobs;
+        }
 
         // console.log(reference)
         // return res.status(200).json({
