@@ -59,16 +59,12 @@ class AdminModel extends ClientModel {
 class WorkerModel extends ClientModel {
     constructor(data) {
         super(data);
-        this.bankName = data.bankName;
-        this.bankNumber = data.bankNumber;
         this.description = data.description;
     }
 
     getInfo() {
         return {
             ...super.getInfo(),
-            bankName: this.bankName,
-            bankNumber: this.bankNumber,
             description: this.description
         }
     }

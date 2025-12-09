@@ -53,7 +53,6 @@ app.use('/api/chatbot', ChatBotRouter);
 
 const { cleaningJobSchedule, healthcareJobSchedule } = require('./src/notifications/JobNotifications');
 const { checkCleaningJob, checkHealthcareJob, checkMaintenanceJob } = require('./src/notifications/JobCancel');
-const { getLatLon } = require('./src/utils/getLatLon');
 
 // Promise.all([
 //     cleaningJobSchedule(),

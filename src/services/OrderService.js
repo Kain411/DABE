@@ -51,6 +51,7 @@ class OrderService {
             const snapshot = await db.collection('orders').get();
 
             const orders = [];
+            console.log(snapshot.docs)
             await Promise.all(snapshot.docs.map(async (doc) => {
                 try {
                     const [ jobDoc, workerDoc ] = await Promise.all([
@@ -69,6 +70,8 @@ class OrderService {
                         serviceType: doc.data().serviceType,
                         createdAt: formatDateAndTime(doc.data().createdAt.toDate())
                     }
+
+                    console.log(order)
 
                     orders.push(order);
                 } catch (err) {

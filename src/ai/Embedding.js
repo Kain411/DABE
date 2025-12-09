@@ -7,6 +7,8 @@ const jobEmbedding = async (job) => {
     try {
         const response = await axios.post(`${process.env.AI_URL}/job-embedding`, job)
 
+        console.log(response.data)
+
     } catch (err) {
         console.log(err.message);
     }
