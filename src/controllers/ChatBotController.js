@@ -1,11 +1,38 @@
 const { default: axios } = require("axios");
 const { failResponse, ressponseAI } = require("../utils/response");
 const dotenv = require('dotenv');
-const UserService = require("../services/UserService");
-const WorkerService = require("../services/WorkerService");
 const ReviewService = require("../services/ReviewService");
 const OrderService = require("../services/OrderService");
+const JobService = require("../services/JobService");
+const ServiceService = require("../services/ServiceService");
 dotenv.config();
+
+const getJob = async (jobID, serviceType) => {
+
+    const job = await JobService.getByUID(jobID, serviceType);
+    
+    if (job.serviceType==='HEALTHCARE') {
+        job.services = await Promise.all(job.services.map(async (service) => {
+            const doc = await ServiceService.getHealthcareServiceByUID(service.uid);
+            return {
+                ...service,
+                serviceName: doc.serviceName
+            }
+        }))
+    }
+    else if (job.serviceType==='MAINTENANCE') {
+        job.services = await Promise.all(job.services.map(async (service) => {
+            const doc = await ServiceService.getMaintenanceServiceByUID(service.uid);
+            return {
+                ...service,
+                serviceName: doc.serviceName,
+                maintenance: doc.maintenance
+            }
+        }))
+    }
+
+    return job;
+}
 
 const getExperienceOfWorker = async (role, clientID) => {
     try {
@@ -62,7 +89,8 @@ const getJobs = async (clientID) => {
         const jobs = [];
         const maxJobs = orders.length<5 ? orders.length : 5;
         for (let i = 0; i < maxJobs; i++) {
-            jobs.push(orders[i].job)
+            const job = orders[i].job;
+            jobs.push(await getJob(job.uid, job.serviceType));
         }
 
         return jobs;
@@ -77,6 +105,7 @@ const search = async (req, res ) => {
         const clientID = req.client.uid;
         const role = req.client.role;
 
+        reference['session_id'] = clientID;
         reference['role'] = role;
 
         const [experiences, jobs] = await Promise.all([
@@ -87,7 +116,10 @@ const search = async (req, res ) => {
         reference['experiences'] = experiences;
         reference['jobs'] = jobs;
 
-        console.log(reference)
+        // console.log(reference)
+        // return res.status(200).json({
+        //     "data": reference
+        // })
 
         const response = await axios.post(
             `${process.env.AI_URL}/chatbot`, 
