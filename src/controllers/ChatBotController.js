@@ -65,7 +65,7 @@ const getJobs = async (clientID) => {
             "Completed": 3,
             "Cancel": 0,
             "Rejected": -1,
-            "Waiting": 1
+            "Processing": 1
         }
 
         const orders = await OrderService.getOrdersByWorkerID(clientID);
