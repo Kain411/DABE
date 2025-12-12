@@ -62,10 +62,11 @@ const getJobs = async (clientID) => {
 
         const scoreStatus = {
             "Accepted": 2,
-            "Completed": 3,
+            "Completed": 4,
             "Cancel": 0,
             "Rejected": -1,
-            "Processing": 1
+            "Processing": 3,
+            "Hiring": 1
         }
 
         const orders = await OrderService.getOrdersByWorkerID(clientID);
