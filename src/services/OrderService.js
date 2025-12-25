@@ -30,6 +30,7 @@ class OrderService {
         const orderRef = await db.collection('orders')
             .where('workerID', '==', workerID)
             .where('jobID', '==', jobID)
+            .where('status', '!=', 'Cancel')
             .get()
         
         if (orderRef.empty) return true;
